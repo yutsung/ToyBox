@@ -7,15 +7,16 @@ def count_runtime(func):
     @wraps(func)
     def with_runtime():
         starttime = time.time()
-        func()
+        out_func = func()
         endtime = time.time()
         print("runtime: %10.8f" % (endtime-starttime))
-        return func()
+        return out_func
     return with_runtime
 
 
 @count_runtime
 def hello_world():
+    time.sleep(2)
     return "Hello World"
 
 

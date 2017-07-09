@@ -1,11 +1,13 @@
 """
 """
+from functools import wraps
 import time
 
 def count_runtime(func):
-    def with_runtime():
+    @wraps(func)
+    def with_runtime(*args, **kwargs):
         starttime = time.time()
-        out_func = func()
+        out_func = func(*args, **kwargs)
         endtime = time.time()
         print("runtime: %10.8f" % (endtime-starttime))
         return out_func
@@ -13,15 +15,15 @@ def count_runtime(func):
 
 
 @count_runtime
-def hello_world():
+def power2(x):
     time.sleep(2)
-    return "Hello World"
+    return x**2
 
 
 def main():
-    string = hello_world()
-    print(string)
+    y = power2(5)
+    print(y)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
