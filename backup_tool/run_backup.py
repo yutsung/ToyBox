@@ -2,10 +2,17 @@
 """
 Python script for backup file or folder
 
+This program can generate new folder by your username 
+under storage-folder, so it can used by multi-user.
+
 How to use: 1. list your backup source with full-path
-               in *.txt file and save in working directory
-            2. run this program
+               in *.txt file and save in backup_list directory
+            2. you can set exception keyword just after your 
+               backup source path and separate by ;
+               ex: /home/myname/mycode; mycode/except-folder
+            3. run this program
 """
+
 import datetime
 import json
 import os
@@ -99,8 +106,9 @@ def do_backup(source_dir, dest_dir, tar_file=False,
 
 def main():
 
-    list_path = os.path.dirname(os.path.realpath(__file__))
-    dest_dir0 = "/Users/tsung/ToyBox/backup_tool/storage_zone"
+    main_pwd = os.path.dirname(os.path.realpath(__file__))
+    list_path = main_pwd + "/backup_list"
+    dest_dir0 = main_pwd + "/storage_zone"
     tmpfile_name = "temp"
 
     for list_filename in os.listdir(list_path):
@@ -112,12 +120,12 @@ def main():
 
         # make destination folder by username
         # find username in different ways depended on OS
-        if sys.platform == "win32":
+        if sys.platform == "win32" or "windows":
             list_ownername = os.getlogin()
             dest_dir += ("/" + list_ownername)
             if not os.path.exists(dest_dir):
                 os.mkdir(dest_dir)
-        elif sys.platform == "linux" or "darwin":
+        elif sys.platform == "linux" or "linux2" or "darwin":
             list_uid = os.stat(list_path + "/" + list_filename).st_uid
             list_ownername = pwd.getpwuid(list_uid).pw_name
             dest_dir += ("/" + list_ownername)
