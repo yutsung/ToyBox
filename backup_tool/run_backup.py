@@ -149,7 +149,7 @@ def main():
                     tar_file=False,
                     check_date=True,
                     filter_func=tar_filter_func,
-                    )
+                )
             else:
                 do_backup(
                     source_dir,
@@ -157,7 +157,7 @@ def main():
                     tar_file=True,
                     check_date=True,
                     filter_func=tar_filter_func,
-                    )
+                )
     os.remove(tmpfile_name+".json")
 
 
