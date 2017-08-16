@@ -124,13 +124,13 @@ def main():
             list_ownername = os.getlogin()
             dest_dir += ("/" + list_ownername)
             if not os.path.exists(dest_dir):
-                os.mkdir(dest_dir)
+                os.makedirs(dest_dir)
         elif sys.platform == "linux" or "linux2" or "darwin":
             list_uid = os.stat(list_path + "/" + list_filename).st_uid
             list_ownername = pwd.getpwuid(list_uid).pw_name
             dest_dir += ("/" + list_ownername)
             if not os.path.exists(dest_dir):
-                os.mkdir(dest_dir)
+                os.makedirs(dest_dir)
 
         # read backup list
         source_dir_list = read_backup_list(list_path, list_filename)
