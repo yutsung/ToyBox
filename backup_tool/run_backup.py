@@ -19,7 +19,7 @@ import os
 import shutil
 import sys
 import tarfile
-if "linux" or "darwin" in sys.platform:
+if 'linux' or 'darwin' in sys.platform:
     import pwd
 
 
@@ -33,14 +33,40 @@ def read_backup_list(list_path, list_filename):
     :return: list of source directory
     """
     source_dir_list = []
-    with open(list_path+"/"+list_filename, encoding="utf-8") as fid:
+    with open(list_path+'/'+list_filename, encoding='utf-8') as fid:
         for line in fid:
-            line_exclude = line.strip().split(";")[1:]
-            line = line.strip().split(";")[0]
+            line_exclude = line.strip().split(';')[1:]
+            line = line.strip().split(';')[0]
             if not os.path.exists(line):
                 continue
+            while '' in line_exclude:
+                line_exclude.remove('')
             source_dir_list.append((line, line_exclude))
     return source_dir_list
+
+
+def get_mtime(path):
+    """
+    get the time of last modification of all folders/files in path
+
+    :param path: the directory that you want to know total-size
+    :return: the last modification time in datetime format
+    """
+    if os.path.isfile(path):
+        last_mtime = datetime.datetime.fromtimestamp(
+            os.path.getmtime(path)
+        )
+        return last_mtime
+    last_mtime = datetime.datetime(1970, 1, 1)
+    for ipath, _, ifilename_list in os.walk(path):
+        for ifilename in ifilename_list:
+            ifile_dir = os.path.join(ipath, ifilename)
+            last_mtime_tmp = datetime.datetime.fromtimestamp(
+                os.path.getmtime(ifile_dir)
+            )
+            if last_mtime_tmp > last_mtime:
+                last_mtime = last_mtime_tmp
+    return last_mtime
 
 
 def get_size(path):
@@ -62,7 +88,7 @@ def get_size(path):
 
 
 def tar_filter_func(tarinfo):
-    with open("temp.json") as fid:
+    with open('temp.json') as fid:
         exclude_list = json.load(fid)
     for iname in exclude_list:
         if iname.strip() in tarinfo.name:
@@ -86,16 +112,14 @@ def do_backup(source_dir, dest_dir, tar_file=False,
     basename = os.path.basename(source_dir)
 
     if check_date:
-        if os.path.exists(dest_dir+"/"+basename+".tgz"):
-            source_mtime = datetime.datetime.utcfromtimestamp(
-                os.path.getmtime(source_dir))
-            destin_mtime = datetime.datetime.utcfromtimestamp(
-                os.path.getmtime(dest_dir+"/"+basename+".tgz"))
+        if os.path.exists(dest_dir+'/'+basename+'.tgz'):
+            source_mtime = get_mtime(source_dir)
+            destin_mtime = get_mtime(dest_dir+'/'+basename+'.tgz')
             if destin_mtime >= source_mtime:
                 return
 
     if tar_file:
-        with tarfile.open(dest_dir+"/"+basename+".tgz", "w:gz") as tarid:
+        with tarfile.open(dest_dir+'/'+basename+'.tgz', 'w:gz') as tarid:
             if filter_func == None:
                 tarid.add(source_dir, arcname=basename)
             else:
@@ -107,28 +131,28 @@ def do_backup(source_dir, dest_dir, tar_file=False,
 def main():
 
     main_pwd = os.path.dirname(os.path.realpath(__file__))
-    list_path = main_pwd + "/backup_list"
-    dest_dir0 = main_pwd + "/storage_zone"
-    tmpfile_name = "temp"
+    list_path = main_pwd + '/backup_list'
+    dest_dir0 = main_pwd + '/storage_zone'
+    tmpfile_name = 'temp'
 
     for list_filename in os.listdir(list_path):
         dest_dir = dest_dir0
 
         # avoid some irrelevant folders in list_path
-        if ".txt" not in list_filename:
+        if '.txt' not in list_filename:
             continue
 
         # make destination folder by username
         # find username in different ways depended on OS
-        if sys.platform == "win32" or "windows":
+        if sys.platform == 'win32' or 'windows':
             list_ownername = os.getlogin()
-            dest_dir += ("/" + list_ownername)
+            dest_dir += ('/' + list_ownername)
             if not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
-        elif sys.platform == "linux" or "linux2" or "darwin":
-            list_uid = os.stat(list_path + "/" + list_filename).st_uid
+        elif sys.platform == 'linux' or 'linux2' or 'darwin':
+            list_uid = os.stat(list_path + '/' + list_filename).st_uid
             list_ownername = pwd.getpwuid(list_uid).pw_name
-            dest_dir += ("/" + list_ownername)
+            dest_dir += ('/' + list_ownername)
             if not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
 
@@ -136,9 +160,9 @@ def main():
         source_dir_list = read_backup_list(list_path, list_filename)
 
         for source_dir, exclude_list in source_dir_list:
-            with open(tmpfile_name+".json", "w") as fid:
+            with open(tmpfile_name+'.json', 'w') as fid:
                 json.dump(exclude_list, fid)
-            if source_dir[-1] == "/":
+            if source_dir[-1] == '/':
                 source_dir = source_dir[:-1]
             # call do_backup()
             source_isfile = os.path.isfile(source_dir)
@@ -158,8 +182,8 @@ def main():
                     check_date=True,
                     filter_func=tar_filter_func,
                 )
-    os.remove(tmpfile_name+".json")
+    os.remove(tmpfile_name+'.json')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
