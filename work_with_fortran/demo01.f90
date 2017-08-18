@@ -9,8 +9,6 @@ subroutine fortran_sub(a_int, some_floats, a_string) bind(c, name="sub01")
     integer(c_int), intent(inout) :: a_int
     real(c_double), intent(inout) :: some_floats(a_int)
     character(c_char), intent(in) :: a_string(a_int)
-    character(len=80) :: test
-
 
     do i = 1, a_int
         some_floats(i) = some_floats(i)+i
