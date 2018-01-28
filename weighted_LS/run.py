@@ -32,7 +32,8 @@ def main():
    line1.set_label('LS')
    line2.set_label('weighted LS')
    ax.legend(fontsize=16)
-   fig.savefig('weighted_LS.png')
+   #fig.savefig('weighted_LS.png')
+   plt.show()
 
 
 if __name__ == '__main__':
