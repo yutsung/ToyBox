@@ -1,17 +1,18 @@
 """
 """
-from functools import wraps
+import datetime
 import time
+from functools import wraps
 
 
 def count_runtime(func):
     @wraps(func)
     def with_runtime(*args, **kwargs):
-        starttime = time.time()
+        starttime = datetime.datetime.now()
         out_func = func(*args, **kwargs)
-        endtime = time.time()
+        endtime = datetime.datetime.now()
         print(
-            '{}, runtime: {:10.8f}'.format(
+            '{}, runtime: {}'.format(
                 func.__name__, 
                 endtime - starttime
             )
