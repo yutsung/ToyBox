@@ -15,5 +15,5 @@ c_a_string = ctypes.c_char_p(a_string)
 
 fortran_dll.sub01(ctypes.byref(c_a_int), c_some_floats, c_a_string)
 
-print(a_int)
+print(c_a_int.value)
 print(some_floats)
